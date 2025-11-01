@@ -10,7 +10,7 @@ This directory contains test projects to validate the Gradle 9 Migration Helper 
 
 **Path to use**: 
 ```
-/Users/zeji/Documents/hobby/gradle-version-migration-tool/development/test/simple-project
+gradle-version-migration-tool/development/test/simple-project
 ```
 
 **Expected Issues**: 8-10
@@ -34,7 +34,7 @@ This directory contains test projects to validate the Gradle 9 Migration Helper 
 
 **Path to use**:
 ```
-/Users/zeji/Documents/hobby/gradle-version-migration-tool/development/test/multi-module-project
+gradle-version-migration-tool/development/test/multi-module-project
 ```
 
 **Modules**: 3 (core, web, api)  
@@ -55,7 +55,7 @@ This directory contains test projects to validate the Gradle 9 Migration Helper 
 
 **Path to use**:
 ```
-/Users/zeji/Documents/hobby/gradle-version-migration-tool/development/test/advanced-issues-project
+gradle-version-migration-tool/development/test/advanced-issues-project
 ```
 
 **Expected Issues**: 12-15
@@ -76,7 +76,7 @@ This directory contains test projects to validate the Gradle 9 Migration Helper 
 
 **Path to use**:
 ```
-/Users/zeji/Documents/hobby/gradle-version-migration-tool/development/test/clean-project
+gradle-version-migration-tool/development/test/clean-project
 ```
 
 **Expected Issues**: 0  
@@ -93,7 +93,7 @@ This directory contains test projects to validate the Gradle 9 Migration Helper 
 
 ### Step 1: Start the Application
 ```bash
-cd /Users/zeji/Documents/hobby/gradle-version-migration-tool
+cd gradle-version-migration-tool
 ./gradlew libertyRun
 ```
 
@@ -103,7 +103,7 @@ Navigate to: http://localhost:9080
 ### Step 3: Test Each Project
 
 #### Test 1: Simple Project
-1. Enter path: `/Users/zeji/Documents/hobby/gradle-version-migration-tool/development/test/simple-project`
+1. Enter path: `gradle-version-migration-tool/development/test/simple-project`
 2. Click "Analyze Project"
 3. Verify 8-10 issues detected
 4. Check that critical issues are highlighted
@@ -112,7 +112,7 @@ Navigate to: http://localhost:9080
 7. Check backup files created
 
 #### Test 2: Multi-Module Project
-1. Enter path: `/Users/zeji/Documents/hobby/gradle-version-migration-tool/development/test/multi-module-project`
+1. Enter path: `gradle-version-migration-tool/development/test/multi-module-project`
 2. Click "Analyze Project"
 3. Verify modules detected: core, web, api
 4. Verify 15-20 issues across all modules
@@ -121,7 +121,7 @@ Navigate to: http://localhost:9080
 7. Verify module-specific fixes
 
 #### Test 3: Advanced Issues Project
-1. Enter path: `/Users/zeji/Documents/hobby/gradle-version-migration-tool/development/test/advanced-issues-project`
+1. Enter path: `gradle-version-migration-tool/development/test/advanced-issues-project`
 2. Click "Analyze Project"
 3. Verify complex issues detected:
    - Convention API
@@ -132,7 +132,7 @@ Navigate to: http://localhost:9080
 6. Verify manual review suggestions for others
 
 #### Test 4: Clean Project
-1. Enter path: `/Users/zeji/Documents/hobby/gradle-version-migration-tool/development/test/clean-project`
+1. Enter path: `gradle-version-migration-tool/development/test/clean-project`
 2. Click "Analyze Project"
 3. Verify NO issues detected
 4. Verify success message displayed
@@ -320,16 +320,16 @@ After testing, document results:
 
 # In browser, test paths:
 # Simple:
-/Users/zeji/Documents/hobby/gradle-version-migration-tool/development/test/simple-project
+gradle-version-migration-tool/development/test/simple-project
 
 # Multi-module:
-/Users/zeji/Documents/hobby/gradle-version-migration-tool/development/test/multi-module-project
+gradle-version-migration-tool/development/test/multi-module-project
 
 # Advanced:
-/Users/zeji/Documents/hobby/gradle-version-migration-tool/development/test/advanced-issues-project
+gradle-version-migration-tool/development/test/advanced-issues-project
 
 # Clean:
-/Users/zeji/Documents/hobby/gradle-version-migration-tool/development/test/clean-project
+gradle-version-migration-tool/development/test/clean-project
 ```
 
 ---
