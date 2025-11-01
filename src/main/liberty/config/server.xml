@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="Gradle Migration Helper Server">
+    <featureManager>
+        <feature>servlet-6.0</feature>
+        <feature>jsonp-2.1</feature>
+        <feature>cdi-4.0</feature>
+        <feature>pages-3.1</feature>
+    </featureManager>
+
+    <httpEndpoint id="defaultHttpEndpoint"
+                  httpPort="${default.http.port}"
+                  httpsPort="${default.https.port}"
+                  host="*" />
+
+    <webApplication id="gradle-migration-helper" 
+                    location="gradle-migration-helper.war" 
+                    contextRoot="${app.context.root}">
+        <classloader delegation="parentLast" />
+    </webApplication>
+
+    <logging consoleLogLevel="INFO" />
+</server>

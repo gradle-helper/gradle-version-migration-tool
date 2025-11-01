@@ -1,0 +1,54 @@
+plugins {
+    id 'war'
+    id 'io.openliberty.tools.gradle.Liberty' version '3.8.2'
+}
+
+group = 'com.migration'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Jakarta EE 10
+    providedCompile 'jakarta.platform:jakarta.jakartaee-web-api:10.0.0'
+    providedCompile 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+    
+    // JSON Processing
+    implementation 'com.google.code.gson:gson:2.10.1'
+    
+    // Logging
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+    implementation 'org.slf4j:slf4j-simple:2.0.9'
+    
+    // Testing
+    testImplementation 'junit:junit:4.13.2'
+}
+
+liberty {
+    server {
+        name = 'gradleMigrationServer'
+        
+        features {
+            acceptLicense = true
+            name = ['servlet-6.0', 'jsonp-2.1', 'cdi-4.0', 'pages-3.1']
+        }
+        
+        configDirectory = file("${project.rootDir}/src/main/liberty/config")
+        bootstrapProperties = [
+            'default.http.port': '9080',
+            'default.https.port': '9443',
+            'app.context.root': '/'
+        ]
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.named('war') {
+    archiveFileName = 'gradle-migration-helper.war'
+}

@@ -1,0 +1,47 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.classpath
+.project
+
+# OpenLiberty
+.libertyls/
+target/
+servers/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.backup.*
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*~
+
+# Test coverage
+.coverage/
+coverage/
