@@ -7,7 +7,7 @@ Copy and paste these paths directly into the application:
 ───────────────────────────────────────────────────────────────
 1. SIMPLE PROJECT (8-10 issues expected)
 ───────────────────────────────────────────────────────────────
-/Users/zeji/Documents/hobby/gradle-version-migration-tool/development/test/simple-project
+gradle-version-migration-tool/development/test/simple-project
 
 Issues: Basic deprecated configurations, task syntax, archive properties
 Best for: First-time testing, basic functionality validation
@@ -16,7 +16,7 @@ Best for: First-time testing, basic functionality validation
 ───────────────────────────────────────────────────────────────
 2. MULTI-MODULE PROJECT (15-20 issues expected)
 ───────────────────────────────────────────────────────────────
-/Users/zeji/Documents/hobby/gradle-version-migration-tool/development/test/multi-module-project
+gradle-version-migration-tool/development/test/multi-module-project
 
 Issues: Multiple modules (core, web, api), cross-module dependencies
 Best for: Testing multi-module support, module filtering
@@ -25,7 +25,7 @@ Best for: Testing multi-module support, module filtering
 ───────────────────────────────────────────────────────────────
 3. ADVANCED ISSUES PROJECT (12-15 issues expected)
 ───────────────────────────────────────────────────────────────
-/Users/zeji/Documents/hobby/gradle-version-migration-tool/development/test/advanced-issues-project
+gradle-version-migration-tool/development/test/advanced-issues-project
 
 Issues: Convention API, dynamic properties, deprecated methods
 Best for: Testing complex issue detection, manual review items
@@ -34,7 +34,7 @@ Best for: Testing complex issue detection, manual review items
 ───────────────────────────────────────────────────────────────
 4. CLEAN PROJECT (0 issues expected)
 ───────────────────────────────────────────────────────────────
-/Users/zeji/Documents/hobby/gradle-version-migration-tool/development/test/clean-project
+gradle-version-migration-tool/development/test/clean-project
 
 Issues: None - already Gradle 9 compatible
 Best for: Testing false positive detection, clean project handling
