@@ -1,0 +1,9 @@
+dependencies {
+    compile project(':core')
+    compile 'org.springframework:spring-web:5.3.23'
+    runtime 'javax.servlet:javax.servlet-api:4.0.1'
+}
+
+jar {
+    archiveName = 'web-module.jar'
+}

@@ -17,7 +17,7 @@ public class GradleIssueDetector {
     }
     
     private static void initializeIssuePatterns() {
-        // Example Pattern: Deprecated compile/runtime configurations
+        // 1. Deprecated compile/runtime configurations
         ISSUE_PATTERNS.put("DEPRECATED_CONFIGURATIONS", new IssuePattern(
             Pattern.compile("\\b(compile|runtime|testCompile|testRuntime)\\s+"),
             "CRITICAL",
@@ -27,57 +27,110 @@ public class GradleIssueDetector {
             true
         ));
         
-        // TODO: Add more detection patterns:
-        // 
-        // 1. Deprecated Convention API
-        //    Pattern: \\bconvention\\s*\\.\\s*getPlugin|\\bconvention\\s*\\[
-        //    Severity: HIGH
-        //    Description: Convention API removed, use Extensions API
-        //
-        // 2. Archive Task Properties
-        //    Pattern: \\barchiveName\\s*=|\\barchiveBaseName\\s*=
-        //    Severity: HIGH
-        //    Description: Use Property API (archiveFileName.set())
-        //
-        // 3. Gradle Version Check
-        //    Pattern: distributionUrl=.*gradle-(\\d+\\.\\d+)
-        //    Severity: CRITICAL
-        //    Description: Check if Gradle version < 9.0
-        //
-        // 4. Task Left-Shift Operator
-        //    Pattern: task\\s+\\w+\\s*<<
-        //    Severity: HIGH
-        //    Description: << operator removed, use doLast { }
-        //
-        // 5. Deprecated API Methods
-        //    Pattern: \\b(getArchivePath|getClassesDir|getDestinationDir)\\s*\\(
-        //    Severity: HIGH
-        //    Description: Use Property API equivalents
-        //
-        // 6. Deprecated Dependency Configuration Methods
-        //    Pattern: (compile|runtime|testCompile|testRuntime)\\s*\\(
-        //    Severity: CRITICAL
-        //    Description: Use implementation(), runtimeOnly(), etc.
-        //
-        // 7. SourceSet Output Properties
-        //    Pattern: sourceSets\\.\\w+\\.output\\.classesDir
-        //    Severity: HIGH
-        //    Description: Use classesDirs (plural)
-        //
-        // 8. Deprecated Task Types
-        //    Pattern: \\b(Upload|InstallTask)\\b
-        //    Severity: HIGH
-        //    Description: Use maven-publish or ivy-publish plugins
-        //
-        // 9. Dynamic Properties
-        //    Pattern: \\bproject\\.ext\\[|\\bext\\[
-        //    Severity: MEDIUM
-        //    Description: Consider typed extensions
-        //
-        // 10. Legacy Buildscript Classpath
-        //     Pattern: buildscript\\s*\\{[^}]*classpath\\s+['\"]
-        //     Severity: MEDIUM
-        //     Description: Migrate to plugins {} block
+        // 2. Deprecated API usage
+        ISSUE_PATTERNS.put("DEPRECATED_API", new IssuePattern(
+            Pattern.compile("\\bconvention\\s*\\.\\s*getPlugin|\\bconvention\\s*\\["),
+            "HIGH",
+            "Deprecated Convention API",
+            "The Convention API is removed in Gradle 9. Use the newer Provider API and extensions instead. " +
+            "Replace convention.getPlugin() with project.extensions.getByType().",
+            true
+        ));
+        
+        // 3. AbstractArchiveTask changes
+        ISSUE_PATTERNS.put("ARCHIVE_NAME", new IssuePattern(
+            Pattern.compile("\\barchiveName\\s*=|\\barchiveBaseName\\s*=|\\barchiveVersion\\s*=|\\barchiveExtension\\s*="),
+            "HIGH",
+            "Deprecated Archive Task Properties",
+            "Direct property assignment for archive tasks is deprecated. Use the Property API: " +
+            "archiveFileName.set(), archiveBaseName.set(), archiveVersion.set(), archiveExtension.set().",
+            true
+        ));
+        
+        // 4. Gradle wrapper version
+        ISSUE_PATTERNS.put("GRADLE_VERSION", new IssuePattern(
+            Pattern.compile("distributionUrl=.*gradle-(\\d+\\.\\d+)"),
+            "CRITICAL",
+            "Gradle Version Update Required",
+            "Your project is using an older Gradle version. Gradle 9.x requires updating the wrapper to version 9.0 or higher.",
+            true
+        ));
+        
+        // 5. Deprecated task configuration
+        ISSUE_PATTERNS.put("TASK_LEFTSHIFT", new IssuePattern(
+            Pattern.compile("task\\s+\\w+\\s*<<"),
+            "HIGH",
+            "Deprecated Task Configuration (<<)",
+            "The << operator for task configuration is removed. Use doLast { } instead.",
+            true
+        ));
+        
+        // 6. Deprecated dynamic properties
+        ISSUE_PATTERNS.put("DYNAMIC_PROPERTIES", new IssuePattern(
+            Pattern.compile("\\bproject\\.ext\\[|\\bext\\["),
+            "MEDIUM",
+            "Dynamic Properties Usage",
+            "Dynamic properties using ext[] are discouraged. Consider using typed extensions or the Provider API for better type safety.",
+            false
+        ));
+        
+        // 7. Deprecated Gradle API methods
+        ISSUE_PATTERNS.put("DEPRECATED_METHODS", new IssuePattern(
+            Pattern.compile("\\b(getArchivePath|getClassesDir|getDestinationDir)\\s*\\("),
+            "HIGH",
+            "Deprecated Gradle API Methods",
+            "Methods like getArchivePath(), getClassesDir(), and getDestinationDir() are removed. " +
+            "Use archiveFile.get(), classesDirectory.get(), and destinationDirectory.get() respectively.",
+            true
+        ));
+        
+        // 8. Deprecated configurations in dependencies
+        ISSUE_PATTERNS.put("DEPRECATED_DEPENDENCY_CONFIG", new IssuePattern(
+            Pattern.compile("(compile|runtime|testCompile|testRuntime)\\s*\\("),
+            "CRITICAL",
+            "Deprecated Dependency Configuration Methods",
+            "Dependency configuration methods compile(), runtime(), testCompile(), and testRuntime() are removed. " +
+            "Use implementation(), runtimeOnly(), testImplementation(), and testRuntimeOnly().",
+            true
+        ));
+        
+        // 9. Deprecated buildscript classpath
+        ISSUE_PATTERNS.put("BUILDSCRIPT_CLASSPATH", new IssuePattern(
+            Pattern.compile("buildscript\\s*\\{[^}]*classpath\\s+['\"]"),
+            "MEDIUM",
+            "Legacy Buildscript Classpath",
+            "Consider migrating to the plugins {} block instead of buildscript {} for plugin dependencies. " +
+            "This provides better dependency resolution and version management.",
+            false
+        ));
+        
+        // 10. Deprecated SourceSet output
+        ISSUE_PATTERNS.put("SOURCESET_OUTPUT", new IssuePattern(
+            Pattern.compile("sourceSets\\.\\w+\\.output\\.classesDir"),
+            "HIGH",
+            "Deprecated SourceSet Output Property",
+            "The classesDir property is removed. Use classesDirs (plural) which returns a FileCollection.",
+            true
+        ));
+        
+        // 11. Deprecated task types
+        ISSUE_PATTERNS.put("DEPRECATED_TASK_TYPES", new IssuePattern(
+            Pattern.compile("\\b(Upload|InstallTask)\\b"),
+            "HIGH",
+            "Deprecated Task Types",
+            "Task types like Upload and InstallTask are removed. Use the maven-publish or ivy-publish plugins instead.",
+            false
+        ));
+        
+        // 12. Deprecated Gradle properties
+        ISSUE_PATTERNS.put("DEPRECATED_PROPERTIES", new IssuePattern(
+            Pattern.compile("\\b(archivesBaseName|version|group)\\s*="),
+            "MEDIUM",
+            "Direct Property Assignment",
+            "Direct assignment to properties like archivesBaseName is deprecated. " +
+            "Use base.archivesName.set() for archivesBaseName in Gradle 9.",
+            true
+        ));
     }
     
     public ProjectInfo analyzeProject(String projectPath) throws IOException {
@@ -218,7 +271,6 @@ public class GradleIssueDetector {
     }
     
     private String generateDetailedExplanation(String issueType, String matchedText) {
-        // TODO: Add detailed explanations for other issue types
         switch (issueType) {
             case "DEPRECATED_CONFIGURATIONS":
                 return "Gradle 9 has removed the legacy dependency configurations. The matched code '" + matchedText + 
@@ -226,13 +278,47 @@ public class GradleIssueDetector {
                        "Migration: compile → implementation, runtime → runtimeOnly, " +
                        "testCompile → testImplementation, testRuntime → testRuntimeOnly.";
                        
+            case "DEPRECATED_API":
+                return "The Convention API has been removed in Gradle 9. The code '" + matchedText + 
+                       "' uses this deprecated API. Replace with the Extensions API: " +
+                       "project.extensions.getByType(YourExtension.class) or use the Provider API.";
+                       
+            case "ARCHIVE_NAME":
+                return "Archive task properties must now use the Property API. The code '" + matchedText + 
+                       "' uses direct assignment which is no longer supported. " +
+                       "Use .set() method instead: archiveFileName.set('name.jar')";
+                       
+            case "GRADLE_VERSION":
+                return "Your gradle-wrapper.properties specifies an older Gradle version. " +
+                       "Gradle 9.x requires updating the wrapper. Run: ./gradlew wrapper --gradle-version 9.0";
+                       
+            case "TASK_LEFTSHIFT":
+                return "The << operator for task configuration was removed. The code '" + matchedText + 
+                       "' must be updated to use doLast { } block instead.";
+                       
+            case "DEPRECATED_METHODS":
+                return "The method in '" + matchedText + "' has been removed in Gradle 9. " +
+                       "Use the Property API equivalents: getArchivePath() → archiveFile.get(), " +
+                       "getClassesDir() → classesDirectory.get(), getDestinationDir() → destinationDirectory.get()";
+                       
+            case "DEPRECATED_DEPENDENCY_CONFIG":
+                return "Dependency configuration method '" + matchedText + "' is removed in Gradle 9. " +
+                       "Update to use implementation(), runtimeOnly(), testImplementation(), or testRuntimeOnly().";
+                       
+            case "SOURCESET_OUTPUT":
+                return "The classesDir property is removed. Use classesDirs (plural) which returns a FileCollection " +
+                       "containing all output directories for the source set.";
+                       
+            case "DEPRECATED_PROPERTIES":
+                return "Direct property assignment '" + matchedText + "' should be migrated to the Property API. " +
+                       "For archivesBaseName, use: base { archivesName.set('name') }";
+                       
             default:
                 return "This code pattern is deprecated or removed in Gradle 9 and requires migration.";
         }
     }
     
     private String generateSuggestedFix(String issueType, String matchedText) {
-        // TODO: Add suggested fixes for other issue types
         switch (issueType) {
             case "DEPRECATED_CONFIGURATIONS":
                 if (matchedText.contains("compile ")) {
@@ -243,6 +329,51 @@ public class GradleIssueDetector {
                     return matchedText.replace("testCompile ", "testImplementation ");
                 } else if (matchedText.contains("testRuntime ")) {
                     return matchedText.replace("testRuntime ", "testRuntimeOnly ");
+                }
+                break;
+                
+            case "DEPRECATED_DEPENDENCY_CONFIG":
+                if (matchedText.contains("compile(")) {
+                    return matchedText.replace("compile(", "implementation(");
+                } else if (matchedText.contains("runtime(")) {
+                    return matchedText.replace("runtime(", "runtimeOnly(");
+                } else if (matchedText.contains("testCompile(")) {
+                    return matchedText.replace("testCompile(", "testImplementation(");
+                } else if (matchedText.contains("testRuntime(")) {
+                    return matchedText.replace("testRuntime(", "testRuntimeOnly(");
+                }
+                break;
+                
+            case "ARCHIVE_NAME":
+                if (matchedText.contains("archiveName =")) {
+                    return matchedText.replace("archiveName =", "archiveFileName.set(");
+                } else if (matchedText.contains("archiveBaseName =")) {
+                    return matchedText.replace("archiveBaseName =", "archiveBaseName.set(");
+                } else if (matchedText.contains("archiveVersion =")) {
+                    return matchedText.replace("archiveVersion =", "archiveVersion.set(");
+                }
+                break;
+                
+            case "TASK_LEFTSHIFT":
+                return matchedText.replace("<<", "{ doLast");
+                
+            case "DEPRECATED_METHODS":
+                if (matchedText.contains("getArchivePath()")) {
+                    return matchedText.replace("getArchivePath()", "archiveFile.get()");
+                } else if (matchedText.contains("getClassesDir()")) {
+                    return matchedText.replace("getClassesDir()", "classesDirectory.get()");
+                } else if (matchedText.contains("getDestinationDir()")) {
+                    return matchedText.replace("getDestinationDir()", "destinationDirectory.get()");
+                }
+                break;
+                
+            case "SOURCESET_OUTPUT":
+                return matchedText.replace(".output.classesDir", ".output.classesDirs");
+                
+            case "DEPRECATED_PROPERTIES":
+                if (matchedText.contains("archivesBaseName =")) {
+                    String value = matchedText.substring(matchedText.indexOf("=") + 1).trim();
+                    return "base { archivesName.set(" + value + ") }";
                 }
                 break;
         }

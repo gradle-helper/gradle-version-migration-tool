@@ -45,3 +45,7 @@ Thumbs.db
 # Test coverage
 .coverage/
 coverage/
+
+# Unwanted docs
+PROJECT_COMPLETE.md
+PROJECT_SUMMARY.md

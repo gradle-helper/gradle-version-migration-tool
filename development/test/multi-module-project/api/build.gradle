@@ -1,0 +1,9 @@
+dependencies {
+    compile project(':core')
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.14.0'
+    testCompile 'org.assertj:assertj-core:3.23.1'
+}
+
+task generateApi << {
+    println 'Generating API documentation'
+}

@@ -91,10 +91,30 @@ public class AutoFixer {
         String currentCode = issue.getCurrentCode();
         String suggestedFix = issue.getSuggestedFix();
         
-        // TODO: Add fix implementations for other issue types
         switch (issue.getType()) {
             case "DEPRECATED_CONFIGURATIONS":
                 return fixDeprecatedConfigurations(content, currentCode, suggestedFix);
+                
+            case "DEPRECATED_DEPENDENCY_CONFIG":
+                return fixDeprecatedDependencyConfig(content, currentCode, suggestedFix);
+                
+            case "ARCHIVE_NAME":
+                return fixArchiveProperties(content, currentCode, suggestedFix);
+                
+            case "TASK_LEFTSHIFT":
+                return fixTaskLeftShift(content, currentCode);
+                
+            case "DEPRECATED_METHODS":
+                return fixDeprecatedMethods(content, currentCode, suggestedFix);
+                
+            case "SOURCESET_OUTPUT":
+                return fixSourceSetOutput(content, currentCode, suggestedFix);
+                
+            case "DEPRECATED_PROPERTIES":
+                return fixDeprecatedProperties(content, currentCode, suggestedFix);
+                
+            case "DEPRECATED_API":
+                return fixDeprecatedAPI(content, currentCode);
                 
             default:
                 // Generic replacement
@@ -115,35 +135,88 @@ public class AutoFixer {
         return result;
     }
     
-    // TODO: Implement fix methods for other issue types:
-    //
-    // private String fixDeprecatedDependencyConfig(String content, String currentCode, String suggestedFix) {
-    //     // Replace compile() with implementation(), etc.
-    // }
-    //
-    // private String fixArchiveProperties(String content, String currentCode, String suggestedFix) {
-    //     // Replace archiveName = with archiveFileName.set()
-    // }
-    //
-    // private String fixTaskLeftShift(String content, String currentCode) {
-    //     // Replace task << with task { doLast
-    // }
-    //
-    // private String fixDeprecatedMethods(String content, String currentCode, String suggestedFix) {
-    //     // Replace getArchivePath() with archiveFile.get()
-    // }
-    //
-    // private String fixSourceSetOutput(String content, String currentCode, String suggestedFix) {
-    //     // Replace classesDir with classesDirs
-    // }
-    //
-    // private String fixDeprecatedProperties(String content, String currentCode, String suggestedFix) {
-    //     // Replace archivesBaseName = with base { archivesName.set() }
-    // }
-    //
-    // private String fixDeprecatedAPI(String content, String currentCode) {
-    //     // Replace convention API with extensions API
-    // }
+    private String fixDeprecatedDependencyConfig(String content, String currentCode, String suggestedFix) {
+        String result = content;
+        
+        result = result.replaceAll("\\bcompile\\(", "implementation(");
+        result = result.replaceAll("\\bruntime\\(", "runtimeOnly(");
+        result = result.replaceAll("\\btestCompile\\(", "testImplementation(");
+        result = result.replaceAll("\\btestRuntime\\(", "testRuntimeOnly(");
+        
+        return result;
+    }
+    
+    private String fixArchiveProperties(String content, String currentCode, String suggestedFix) {
+        String result = content;
+        
+        // Fix archiveName
+        result = result.replaceAll("archiveName\\s*=\\s*([^\\n]+)", "archiveFileName.set($1)");
+        
+        // Fix archiveBaseName
+        result = result.replaceAll("archiveBaseName\\s*=\\s*([^\\n]+)", "archiveBaseName.set($1)");
+        
+        // Fix archiveVersion
+        result = result.replaceAll("archiveVersion\\s*=\\s*([^\\n]+)", "archiveVersion.set($1)");
+        
+        // Fix archiveExtension
+        result = result.replaceAll("archiveExtension\\s*=\\s*([^\\n]+)", "archiveExtension.set($1)");
+        
+        return result;
+    }
+    
+    private String fixTaskLeftShift(String content, String currentCode) {
+        // Replace task << with task { doLast
+        Pattern pattern = Pattern.compile("(task\\s+\\w+)\\s*<<\\s*\\{");
+        Matcher matcher = pattern.matcher(content);
+        StringBuffer sb = new StringBuffer();
+        
+        while (matcher.find()) {
+            matcher.appendReplacement(sb, matcher.group(1) + " {\n    doLast {");
+        }
+        matcher.appendTail(sb);
+        
+        return sb.toString();
+    }
+    
+    private String fixDeprecatedMethods(String content, String currentCode, String suggestedFix) {
+        String result = content;
+        
+        result = result.replaceAll("\\.getArchivePath\\(\\)", ".archiveFile.get()");
+        result = result.replaceAll("\\.getClassesDir\\(\\)", ".classesDirectory.get()");
+        result = result.replaceAll("\\.getDestinationDir\\(\\)", ".destinationDirectory.get()");
+        
+        return result;
+    }
+    
+    private String fixSourceSetOutput(String content, String currentCode, String suggestedFix) {
+        return content.replaceAll("\\.output\\.classesDir\\b", ".output.classesDirs");
+    }
+    
+    private String fixDeprecatedProperties(String content, String currentCode, String suggestedFix) {
+        // Handle archivesBaseName specifically
+        Pattern pattern = Pattern.compile("archivesBaseName\\s*=\\s*([^\\n]+)");
+        Matcher matcher = pattern.matcher(content);
+        
+        if (matcher.find()) {
+            String value = matcher.group(1).trim();
+            String replacement = "base {\n    archivesName.set(" + value + ")\n}";
+            return content.replace(matcher.group(0), replacement);
+        }
+        
+        return content;
+    }
+    
+    private String fixDeprecatedAPI(String content, String currentCode) {
+        // Replace convention API with extensions API
+        String result = content;
+        
+        result = result.replaceAll("convention\\.getPlugin\\(([^)]+)\\)", 
+                                   "extensions.getByType($1)");
+        result = result.replaceAll("convention\\[([^]]+)\\]", 
+                                   "extensions.getByName($1)");
+        
+        return result;
+    }
     
     private String createBackup(Path filePath) throws IOException {
         String timestamp = String.valueOf(System.currentTimeMillis());

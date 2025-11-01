@@ -1,0 +1,62 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group = 'com.example.mixed'
+version = '1.5.0'
+archivesBaseName = 'mixed-app'
+
+repositories {
+    mavenCentral()
+}
+
+// Mix of old and new syntax
+dependencies {
+    // Old style
+    compile 'org.springframework:spring-core:5.3.23'
+    runtime 'mysql:mysql-connector-java:8.0.30'
+    
+    // New style (already correct)
+    implementation 'com.google.guava:guava:31.1-jre'
+    runtimeOnly 'org.postgresql:postgresql:42.5.0'
+    
+    // Old style
+    testCompile 'junit:junit:4.13.2'
+    
+    // New style (already correct)
+    testImplementation 'org.assertj:assertj-core:3.23.1'
+}
+
+// Some correct, some incorrect
+jar {
+    archiveName = 'old-style.jar'  // Wrong
+    archiveBaseName.set('correct-style')  // Correct
+}
+
+war {
+    archiveFileName.set('app.war')  // Correct
+}
+
+// Old task syntax
+task oldTask << {
+    println 'Old style task'
+}
+
+// New task syntax (correct)
+tasks.register('newTask') {
+    doLast {
+        println 'New style task'
+    }
+}
+
+// Partially correct
+task mixedTask {
+    doLast {
+        println 'This is correct'
+    }
+}
+
+task anotherOldTask << {
+    println 'Another old style'
+}

@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.example.clean'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+    runtimeOnly 'org.slf4j:slf4j-simple:2.0.9'
+    testImplementation 'junit:junit:4.13.2'
+    testRuntimeOnly 'org.mockito:mockito-core:5.0.0'
+}
+
+tasks.register('hello') {
+    doLast {
+        println 'Hello from clean project'
+    }
+}
+
+jar {
+    archiveFileName.set('clean-app.jar')
+}
+
+base {
+    archivesName.set('clean-project')
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}

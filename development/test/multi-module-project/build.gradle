@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+}
+
+allprojects {
+    group = 'com.example.multimodule'
+    version = '2.0.0'
+    
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    
+    dependencies {
+        compile 'org.apache.commons:commons-lang3:3.12.0'
+        testCompile 'junit:junit:4.13.2'
+    }
+    
+    jar {
+        archiveBaseName = project.name
+        archiveVersion = project.version
+    }
+}
