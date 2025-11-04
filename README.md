@@ -2,6 +2,21 @@
 
 A comprehensive web-based tool to automatically detect and fix Gradle 9 compatibility issues in your Java projects. Built with Jakarta EE 10, Servlets, and OpenLiberty.
 
+---
+
+## 📚 Documentation
+
+**New to the tool?** → **[Getting Started Guide](docs/getting-started.md)** - Get up and running in 5 minutes
+
+**Complete Documentation:**
+- 📖 [User Guide](docs/user-guide.md) - Complete guide to using the tool
+- 🔌 [API Reference](docs/api-reference.md) - REST API documentation
+- 🔍 [Detection Patterns](docs/patterns.md) - What issues are detected
+- 🔧 [Troubleshooting](docs/troubleshooting.md) - Common problems and solutions
+- 📚 [Examples](docs/examples.md) - Real-world migration examples
+
+---
+
 ## ✨ Features
 
 - **🔍 Automatic Issue Detection**: Scans your Gradle project for Gradle 9 compatibility issues

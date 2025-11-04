@@ -12,8 +12,8 @@ repositories {
 
 dependencies {
     // Jakarta EE 10
-    providedCompile 'jakarta.platform:jakarta.jakartaee-web-api:10.0.0'
-    providedCompile 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+    compileOnly 'jakarta.platform:jakarta.jakartaee-web-api:10.0.0'
+    compileOnly 'jakarta.servlet:jakarta.servlet-api:6.0.0'
     
     // JSON Processing
     implementation 'com.google.code.gson:gson:2.10.1'

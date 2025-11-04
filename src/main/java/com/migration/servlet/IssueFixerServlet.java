@@ -1,15 +1,18 @@
 package com.migration.servlet;
 
 import com.google.gson.Gson;
-import com.migration.fixer.AutoFixer;
+import com.migration.api.request.FixRequest;
+import com.migration.api.response.ErrorResponse;
+import com.migration.core.fixer.AutoFixer;
 import com.migration.model.MigrationIssue;
 import com.migration.model.ProjectInfo;
+import com.migration.util.Constants;
+import com.migration.util.SessionManager;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,7 +20,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet("/api/fix")
+@WebServlet(Constants.API_FIX)
 public class IssueFixerServlet extends HttpServlet {
     
     private final Gson gson = new Gson();
@@ -27,8 +30,8 @@ public class IssueFixerServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        response.setContentType(Constants.CONTENT_TYPE_JSON);
+        response.setCharacterEncoding(Constants.CHARSET_UTF8);
         
         PrintWriter out = response.getWriter();
         
@@ -45,22 +48,15 @@ public class IssueFixerServlet extends HttpServlet {
             
             if (fixRequest == null || fixRequest.getIssueIds() == null || fixRequest.getIssueIds().isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.write(gson.toJson(new ErrorResponse("Issue IDs are required")));
+                out.write(gson.toJson(new ErrorResponse(Constants.ERROR_ISSUE_IDS_REQUIRED)));
                 return;
             }
             
             // Get current project from session
-            HttpSession session = request.getSession(false);
-            if (session == null) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.write(gson.toJson(new ErrorResponse("No active session found")));
-                return;
-            }
-            
-            ProjectInfo projectInfo = (ProjectInfo) session.getAttribute("currentProject");
+            ProjectInfo projectInfo = SessionManager.getProjectInfo(request);
             if (projectInfo == null) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.write(gson.toJson(new ErrorResponse("No project analysis found")));
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                out.write(gson.toJson(new ErrorResponse(Constants.ERROR_NO_PROJECT_IN_SESSION)));
                 return;
             }
             
@@ -92,7 +88,7 @@ public class IssueFixerServlet extends HttpServlet {
                 }
                 projectInfo.setIssues(remainingIssues);
                 projectInfo.setTotalIssues(remainingIssues.size());
-                session.setAttribute("currentProject", projectInfo);
+                SessionManager.storeProjectInfo(request, projectInfo);
             }
             
             response.setStatus(HttpServletResponse.SC_OK);
@@ -100,31 +96,7 @@ public class IssueFixerServlet extends HttpServlet {
             
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write(gson.toJson(new ErrorResponse("Error applying fixes: " + e.getMessage())));
-        }
-    }
-    
-    private static class FixRequest {
-        private List<String> issueIds;
-        
-        public List<String> getIssueIds() {
-            return issueIds;
-        }
-        
-        public void setIssueIds(List<String> issueIds) {
-            this.issueIds = issueIds;
-        }
-    }
-    
-    private static class ErrorResponse {
-        private final String error;
-        
-        public ErrorResponse(String error) {
-            this.error = error;
-        }
-        
-        public String getError() {
-            return error;
+            out.write(gson.toJson(new ErrorResponse(Constants.ERROR_APPLYING_FIX + e.getMessage())));
         }
     }
 }

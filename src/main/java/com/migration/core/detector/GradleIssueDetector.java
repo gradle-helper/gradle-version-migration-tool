@@ -1,4 +1,4 @@
-package com.migration.detector;
+package com.migration.core.detector;
 
 import com.migration.model.MigrationIssue;
 import com.migration.model.ProjectInfo;

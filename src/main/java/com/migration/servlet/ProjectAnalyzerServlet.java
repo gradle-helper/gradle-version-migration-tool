@@ -1,19 +1,22 @@
 package com.migration.servlet;
 
 import com.google.gson.Gson;
-import com.migration.detector.GradleIssueDetector;
+import com.migration.api.response.ErrorResponse;
+import com.migration.core.detector.GradleIssueDetector;
 import com.migration.model.ProjectInfo;
+import com.migration.util.Constants;
+import com.migration.util.PathValidator;
+import com.migration.util.SessionManager;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet("/api/analyze")
+@WebServlet(Constants.API_ANALYZE)
 public class ProjectAnalyzerServlet extends HttpServlet {
     
     private final Gson gson = new Gson();
@@ -23,18 +26,19 @@ public class ProjectAnalyzerServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        response.setContentType(Constants.CONTENT_TYPE_JSON);
+        response.setCharacterEncoding(Constants.CHARSET_UTF8);
         
         PrintWriter out = response.getWriter();
         
         try {
-            // Get project path from request
+            // Get and validate project path
             String projectPath = request.getParameter("projectPath");
             
-            if (projectPath == null || projectPath.trim().isEmpty()) {
+            PathValidator.ValidationResult validation = PathValidator.validate(projectPath);
+            if (!validation.isValid()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.write(gson.toJson(new ErrorResponse("Project path is required")));
+                out.write(gson.toJson(new ErrorResponse(validation.getErrorMessage())));
                 return;
             }
             
@@ -42,8 +46,7 @@ public class ProjectAnalyzerServlet extends HttpServlet {
             ProjectInfo projectInfo = detector.analyzeProject(projectPath);
             
             // Store in session for later use
-            HttpSession session = request.getSession();
-            session.setAttribute("currentProject", projectInfo);
+            SessionManager.storeProjectInfo(request, projectInfo);
             
             // Return analysis results
             response.setStatus(HttpServletResponse.SC_OK);
@@ -51,7 +54,7 @@ public class ProjectAnalyzerServlet extends HttpServlet {
             
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write(gson.toJson(new ErrorResponse("Error analyzing project: " + e.getMessage())));
+            out.write(gson.toJson(new ErrorResponse(Constants.ERROR_ANALYZING_PROJECT + e.getMessage())));
         }
     }
     
@@ -59,34 +62,19 @@ public class ProjectAnalyzerServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        response.setContentType(Constants.CONTENT_TYPE_JSON);
+        response.setCharacterEncoding(Constants.CHARSET_UTF8);
         
         PrintWriter out = response.getWriter();
-        HttpSession session = request.getSession(false);
         
-        if (session != null) {
-            ProjectInfo projectInfo = (ProjectInfo) session.getAttribute("currentProject");
-            if (projectInfo != null) {
-                response.setStatus(HttpServletResponse.SC_OK);
-                out.write(gson.toJson(projectInfo));
-                return;
-            }
+        ProjectInfo projectInfo = SessionManager.getProjectInfo(request);
+        if (projectInfo != null) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            out.write(gson.toJson(projectInfo));
+            return;
         }
         
         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        out.write(gson.toJson(new ErrorResponse("No project analysis found in session")));
-    }
-    
-    private static class ErrorResponse {
-        private final String error;
-        
-        public ErrorResponse(String error) {
-            this.error = error;
-        }
-        
-        public String getError() {
-            return error;
-        }
+        out.write(gson.toJson(new ErrorResponse(Constants.ERROR_NO_PROJECT_IN_SESSION)));
     }
 }

@@ -46,6 +46,9 @@ Thumbs.db
 .coverage/
 coverage/
 
-# Unwanted docs
+# Internal/Development docs (not for public)
 PROJECT_COMPLETE.md
 PROJECT_SUMMARY.md
+development/.docs-internal/
+.dev/
+internal-docs/

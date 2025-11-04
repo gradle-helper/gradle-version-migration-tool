@@ -1,4 +1,4 @@
-package com.migration.fixer;
+package com.migration.core.fixer;
 
 import com.migration.model.MigrationIssue;
 
