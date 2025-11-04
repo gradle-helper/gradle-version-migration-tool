@@ -316,6 +316,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - OpenLiberty community
 - Jakarta EE community
 
+## AI Assistance
+
+This project utilized GitHub Copilot & Claude.ai for code generation and assistance in generating html files and writing documentation.
+
 ## 📊 Statistics
 
 - **Lines of Code**: ~2,500+
